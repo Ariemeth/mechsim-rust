@@ -32,21 +32,79 @@ impl World {
     pub fn run_cycle(&mut self, num_cycles: Option<u64>) {
         for i in 1..=num_cycles.unwrap_or(1) {
             println!("Running Cycle {i}");
-            for entity in self.entities.iter() {
+            for entity in self.entities.iter_mut() {
                 println!("Cycling entity {}", entity.name());
-                entity.cycle()
+                entity.cycle();
             }
         }
     }
 }
 
 pub trait Entity {
-    fn cycle(&self);
+    fn cycle(&mut self);
     fn name(&self) -> String;
+    fn print_status(&self);
 }
 
 impl Debug for dyn Entity + 'static {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "(can cycle)")
+    }
+}
+
+#[derive(Debug)]
+pub struct Position {
+    x: u32,
+    y: u32,
+}
+
+impl Position {
+    pub fn new(x: u32, y: u32) -> Self {
+        Self { x, y }
+    }
+
+    pub fn x(&self) -> u32 {
+        self.x
+    }
+    pub fn y(&self) -> u32 {
+        self.y
+    }
+
+    pub fn set_x(&mut self, new_value: u32) {
+        self.x = new_value
+    }
+    pub fn set_y(&mut self, new_value: u32) {
+        self.y = new_value
+    }
+
+    pub fn update(&mut self, velocity: &Velocity) {
+        self.x += velocity.x();
+        self.y += velocity.y();
+    }
+}
+
+#[derive(Debug)]
+pub struct Velocity {
+    x: u32,
+    y: u32,
+}
+
+impl Velocity {
+    pub fn new(x: u32, y: u32) -> Self {
+        Self { x, y }
+    }
+
+    pub fn set_x(&mut self, new_value: u32) {
+        self.x = new_value
+    }
+    pub fn set_y(&mut self, new_value: u32) {
+        self.y = new_value
+    }
+
+    pub fn x(&self) -> u32 {
+        self.x
+    }
+    pub fn y(&self) -> u32 {
+        self.y
     }
 }
