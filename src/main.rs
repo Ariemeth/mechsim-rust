@@ -1,31 +1,52 @@
-use std::str::FromStr;
-
-mod mech;
-mod world;
-
-use mech::Mech;
-
-use crate::world::{Position, Velocity};
+use bevy::prelude::*;
 
 fn main() {
-    println!("Starting Sim!");
-    let mut new_world = world::World::new(
-        128,
-        128,
-        vec![
-            Box::new(Mech::new(String::from_str("mech1").unwrap(), None, None)),
-            Box::new(Mech::new(
-                String::from_str("mech2").unwrap(),
-                Some(Position::new(1, 1)),
-                None,
-            )),
-            Box::new(Mech::new(
-                String::from_str("mech3").unwrap(),
-                None,
-                Some(Velocity::new(1, 0)),
-            )),
-        ],
-    );
-    new_world.run_cycle(Some(2));
-    println!("{}", new_world)
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_plugin(HelloPlugin)
+        .run();
+}
+
+#[derive(Component)]
+struct Person;
+
+#[derive(Component)]
+struct Name(String);
+
+fn add_people(mut commands: Commands) {
+    commands
+        .spawn()
+        .insert(Person)
+        .insert(Name("Elaina Proctor".to_string()));
+    commands
+        .spawn()
+        .insert(Person)
+        .insert(Name("Renzo Hume".to_string()));
+    commands
+        .spawn()
+        .insert(Person)
+        .insert(Name("Zayna Nieves".to_string()));
+}
+
+pub struct HelloPlugin;
+
+struct GreetTimer(Timer);
+
+fn greet_people(time: Res<Time>, mut timer: ResMut<GreetTimer>, query: Query<&Name, With<Person>>) {
+    // update our timer with the time elapsed since the last update
+    // if that caused the timer to finish, we say hello to everyone
+    if timer.0.tick(time.delta()).just_finished() {
+        for name in query.iter() {
+            println!("hello {}!", name.0);
+        }
+    }
+}
+
+impl Plugin for HelloPlugin {
+    fn build(&self, app: &mut App) {
+        // the reason we call from_seconds with the true flag is to make the timer repeat itself
+        app.insert_resource(GreetTimer(Timer::from_seconds(2.0, true)))
+            .add_startup_system(add_people)
+            .add_system(greet_people);
+    }
 }
