@@ -11,6 +11,9 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+      - name:
+        run: |
+          sudo apt install librust-alsa-sys-dev
       - uses: actions-rs/cargo@v1
         with:
           command: build
