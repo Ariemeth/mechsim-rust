@@ -60,7 +60,7 @@ fn setup(
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
     // Add a 2D Camera
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn_bundle(Camera2dBundle::default());
 
     // Spawn the player
     commands
